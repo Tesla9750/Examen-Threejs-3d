@@ -8,7 +8,7 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 // Declaración de variables globales para la cámara, escena, renderizador, reloj, mezclador de animaciones, etc.
 let camara, escenario, renderizador, cronometro, mezclador, modelo, animaciones, animacionActiva, animacionAnterior, controles;
 const teclado = {}; // Objeto para rastrear las teclas presionadas
-const velocidadMovimiento = 250; // Velocidad de movimiento del modelo
+const velocidadMovimiento = 150; // Velocidad de movimiento del modelo
 const objetosColisionables = []; // Array para almacenar objetos con los que se puede colisionar
 
 const estadisticas = new Stats(); // Instancia para mostrar estadísticas de rendimiento
@@ -24,7 +24,7 @@ function iniciarEscenario() {
 
     // Crear y configurar la cámara
     camara = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 2000);
-    camara.position.set(0, 200, 400);
+    camara.position.set(0, 300, 350);
     camara.screenSpacePanning = false;
 
     // Crear la escena y configurar su fondo y niebla
@@ -34,14 +34,14 @@ function iniciarEscenario() {
 
     // Añadir una luz hemisférica a la escena
     const luzHemisferica = new THREE.HemisphereLight(0xFDC373, 0xFDC373);
-    luzHemisferica.position.set(0, 200, 0);
+    luzHemisferica.position.set(0, 300, 0);
     escenario.add(luzHemisferica);
 
     // Añadir una luz direccional a la escena y configurar su sombra
     const luzDireccional = new THREE.DirectionalLight(0xffffff);
-    luzDireccional.position.set(0, 200, 100);
+    luzDireccional.position.set(0, 100, 100);
     luzDireccional.castShadow = true;
-    luzDireccional.shadow.camera.top = 180;
+    luzDireccional.shadow.camera.top = 280;
     luzDireccional.shadow.camera.bottom = -100;
     luzDireccional.shadow.camera.left = -120;
     luzDireccional.shadow.camera.right = 120;
@@ -207,16 +207,23 @@ function cargarAnimaciones(cargador, mezclador, animaciones) {
 
 // Función para crear y añadir cubos colisionables a la escena
 function crearCubosColisionables(escenario, objetosColisionables) {
-    const geometriaCaja = new THREE.BoxGeometry(100, 100, 100);
-    const materialCaja = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+    const geometriaCaja = new THREE.BoxGeometry(150, 150, 150);
+    const materialCaja = new THREE.MeshPhongMaterial({ color: 0xED467A });
+    const posicionInicialPersonaje = new THREE.Vector3(0, 0, 0); // Asumiendo que la posición inicial del personaje es (0, 0, 0)
+    const distanciaMinima = 300; // Distancia mínima entre el personaje y los cubos
 
     for (let i = 0; i < 10; i++) {
-        const cubo = new THREE.Mesh(geometriaCaja, materialCaja);
-        cubo.position.set(
-            Math.random() * 2000 - 1000,
-            25,
-            Math.random() * 2000 - 1000
-        );
+        let cubo;
+        let distancia;
+
+        do {
+            const posicionX = Math.random() * 2000 - 1000;
+            const posicionZ = Math.random() * 2000 - 1000;
+            cubo = new THREE.Mesh(geometriaCaja, materialCaja);
+            cubo.position.set(posicionX, 25, posicionZ);
+            distancia = cubo.position.distanceTo(posicionInicialPersonaje);
+        } while (distancia < distanciaMinima);
+
         cubo.castShadow = false;
         cubo.receiveShadow = false;
         escenario.add(cubo);
